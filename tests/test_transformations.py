@@ -6,6 +6,9 @@ from quinn.extensions import *
 import angelou.sparksession as S
 import angelou.transformations as T
 
+import chispa
+
+
 class TestTransformations(object):
 
     def test_with_greeting(self):
@@ -17,9 +20,7 @@ class TestTransformations(object):
             source_data,
             ["name", "age"]
         )
-
         actual_df = T.with_greeting(source_df)
-
         expected_data = [
             ("jose", 1, "hello!"),
             ("li", 2, "hello!")
@@ -28,8 +29,7 @@ class TestTransformations(object):
             expected_data,
             ["name", "age", "greeting"]
         )
-
-        assert(expected_df.collect() == actual_df.collect())
+        chispa.assert_df_equality(actual_df, expected_df, ignore_nullable = True)
 
 
     def test_with_clean_first_name(self):
@@ -37,12 +37,10 @@ class TestTransformations(object):
             [("jo&&se", "a"), ("##li", "b"), ("!!sam**", "c")],
             [("first_name", StringType(), True), ("letter", StringType(), True)]
         )
-
         actual_df = T.with_clean_first_name(source_df)
-
         expected_df = S.spark.create_df(
             [("jo&&se", "a", "jose"), ("##li", "b", "li"), ("!!sam**", "c", "sam")],
             [("first_name", StringType(), True), ("letter", StringType(), True), ("clean_first_name", StringType(), True)]
         )
+        chispa.assert_df_equality(actual_df, expected_df, ignore_nullable = True)
 
-        assert(expected_df.collect() == actual_df.collect())

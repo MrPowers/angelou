@@ -5,3 +5,4 @@ tests/__pycache__/*.pyc
 
 .pytest_cache/
 dist/
+angelou.egg-info/
